@@ -6,6 +6,7 @@ import pl.bolewski.credit_management.model.Balance;
 import pl.bolewski.credit_management.dto.BalanceDTO;
 import pl.bolewski.credit_management.repository.BalanceRepository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -35,8 +36,8 @@ public class BalanceService {
                     .build();
         } else
             return BalanceDTO.builder()
-                    .creditBalance(0L)
-                    .okoBalance(0L)
+                    .creditBalance(BigDecimal.valueOf(0))
+                    .okoBalance(BigDecimal.valueOf(0))
                     .build();
     }
 }

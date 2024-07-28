@@ -8,5 +8,7 @@ import java.util.Optional;
 
 public interface MoneyRepository extends CrudRepository<Money, Integer> {
 
-    Optional<List<Money>> findByMonthAndAccount(String month, String account);
+    Optional<List<Money>> findByYearAndMonthAndAccount(String year, String month, String account);
+
+    Optional<List<Money>> findByYear(String year);
 }

@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MonthVerifierDTO {
-    private String month;
+public class YearlyVerifierDTO {
+    private String year;
     private BigDecimal needed;
     private BigDecimal collected;
     private BigDecimal status;

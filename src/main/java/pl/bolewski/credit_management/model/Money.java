@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -18,9 +19,10 @@ public class Money {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Long cash;
+    private BigDecimal cash;
     private String account;
     private String month;
+    private String year;
     private LocalDate addedDate;
     private String transaction;
 }

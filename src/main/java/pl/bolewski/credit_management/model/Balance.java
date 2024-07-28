@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -18,6 +20,6 @@ public class Balance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long accountId;
-    private Long okoBalance;
-    private Long creditBalance;
+    private BigDecimal okoBalance;
+    private BigDecimal creditBalance;
 }
