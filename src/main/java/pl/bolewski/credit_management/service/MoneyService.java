@@ -20,37 +20,32 @@ public class MoneyService {
 
 
     public void addMoney(MoneyDTO moneyDTO){
-        Money money = Money.builder()
-                .cash(moneyDTO.getCash())
-                .account(moneyDTO.getAccount())
-                .month(moneyDTO.getMonth())
-                .year(String.valueOf(LocalDate.now().getYear()))
-                .addedDate(LocalDate.now())
-                .transaction("deposit")
-                .build();
-        updateBalance(moneyDTO.getCash(), moneyDTO.getAccount(), money.getTransaction());
-        moneyRepository.save(money);
+        processTransaction(moneyDTO, "deposit");
     }
 
     public void withdrawMoney(MoneyDTO moneyDTO){
+        processTransaction(moneyDTO, "withdraw");
+    }
+
+    private void processTransaction(MoneyDTO moneyDTO, String transaction) {
         Money money = Money.builder()
                 .cash(moneyDTO.getCash())
                 .account(moneyDTO.getAccount())
                 .month(moneyDTO.getMonth())
                 .year(String.valueOf(LocalDate.now().getYear()))
                 .addedDate(LocalDate.now())
-                .transaction("withdraw")
+                .transaction(transaction)
                 .build();
-        updateBalance(moneyDTO.getCash(), moneyDTO.getAccount(), money.getTransaction());
+        updateBalance(moneyDTO.getCash(), moneyDTO.getAccount(), transaction);
         moneyRepository.save(money);
-    }
-
-    public List<Money> getMoney(){
-        return (List<Money>) moneyRepository.findAll();
     }
 
     private void updateBalance(BigDecimal cash, String account, String transaction) {
         calculatorService.updateBalance(cash, account, transaction);
+    }
+
+    public List<Money> getMoney(){
+        return (List<Money>) moneyRepository.findAll();
     }
 
     public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month) {
@@ -58,6 +53,6 @@ public class MoneyService {
     }
 
     public Optional<List<Money>> getMoneyByYear(String year) {
-        return moneyRepository.findByYear(year);
+        return moneyRepository.findByYearAndAccount(year, "credit");
     }
 }

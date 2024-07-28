@@ -15,55 +15,49 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CreditService {
 
+    private static final BigDecimal MONTHLY_TARGET = BigDecimal.valueOf(1835);
+    private static final BigDecimal YEARLY_TARGET_2024 = BigDecimal.valueOf(16515);
+    private static final BigDecimal YEARLY_TARGET_DEFAULT = BigDecimal.valueOf(22020);
+
+
     public final MoneyRepository moneyRepository;
     public final MoneyService moneyService;
     public final CalculatorService calculatorService;
 
     public MonthVerifierDTO checkMonthlyPayouts(String year, String month) {
-        Optional<List<Money>> monthlyMoneyListOptional = moneyService.getMoneyByYearAndMonth(year, month);
-        BigDecimal statusMoney = BigDecimal.ZERO;
-        BigDecimal monthlyMoney = BigDecimal.ZERO;
-        if (monthlyMoneyListOptional.isPresent()) {
-            List<Money> monthlyMoneyList = monthlyMoneyListOptional.get();
-            monthlyMoney = calculatorService.calculateMoneyInsideList(monthlyMoneyList);
-            statusMoney = monthlyMoney.subtract(BigDecimal.valueOf(1835));
-        }
-
-        return MonthVerifierDTO.builder()
-                .month(month)
-                .needed(BigDecimal.valueOf(1835))
-                .collected(monthlyMoney)
-                .status(statusMoney)
-                .build();
+        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYearAndMonth(year, month);
+        List<Money> moneyList = moneyListOptional.orElse(List.of());
+        return createMonthVerifierDTO(month, moneyList);
     }
 
     public YearlyVerifierDTO checkYearlyPayouts(String year) {
-        Optional<List<Money>> yearlyMoneyListOptional = moneyService.getMoneyByYear(year);
-        BigDecimal statusMoney = BigDecimal.ZERO;
-        BigDecimal yearlyMoney = BigDecimal.ZERO;
-        if (yearlyMoneyListOptional.isPresent()) {
-            List<Money> yearlyMoneyList = yearlyMoneyListOptional.get();
-            yearlyMoney = calculatorService.calculateMoneyInsideList(yearlyMoneyList);
-            if (year.equals(String.valueOf(2024)))
-                statusMoney = yearlyMoney.subtract(BigDecimal.valueOf(16515));
-            else
-                statusMoney = yearlyMoney.subtract(BigDecimal.valueOf(22020));
-        }
+        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYear(year);
+        List<Money> moneyList = moneyListOptional.orElse(List.of());
+        return createYearlyVerifierDTO(year, moneyList);
+    }
 
-        if (year.equals(String.valueOf(2024))) {
-            return YearlyVerifierDTO.builder()
-                    .year(year)
-                    .needed(BigDecimal.valueOf(16515))
-                    .collected(yearlyMoney)
-                    .status(statusMoney)
-                    .build();
-        } else {
-            return YearlyVerifierDTO.builder()
-                    .year(year)
-                    .needed(BigDecimal.valueOf(22020))
-                    .collected(yearlyMoney)
-                    .status(statusMoney)
-                    .build();
-        }
+    private MonthVerifierDTO createMonthVerifierDTO(String month, List<Money> moneyList) {
+        BigDecimal collected = calculatorService.calculateMoneyInsideList(moneyList);
+        BigDecimal status = collected.subtract(MONTHLY_TARGET);
+
+        return MonthVerifierDTO.builder()
+                .month(month)
+                .needed(MONTHLY_TARGET)
+                .collected(collected)
+                .status(status)
+                .build();
+    }
+
+    private YearlyVerifierDTO createYearlyVerifierDTO(String year, List<Money> moneyList) {
+        BigDecimal yearlyTarget = year.equals("2024") ? YEARLY_TARGET_2024 : YEARLY_TARGET_DEFAULT;
+        BigDecimal collected = calculatorService.calculateMoneyInsideList(moneyList);
+        BigDecimal status = collected.subtract(yearlyTarget);
+
+        return YearlyVerifierDTO.builder()
+                .year(year)
+                .needed(yearlyTarget)
+                .collected(collected)
+                .status(status)
+                .build();
     }
 }

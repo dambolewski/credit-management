@@ -8,7 +8,6 @@ import pl.bolewski.credit_management.repository.BalanceRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,31 +16,35 @@ public class CalculatorService {
     private final BalanceRepository balanceRepository;
 
     public void updateBalance(BigDecimal cash, String account, String transaction) {
-        Optional<Balance> balanceOptional = balanceRepository.findByAccountId(1L);
-        if (balanceOptional.isPresent()) {
-            Balance balance = balanceOptional.get();
-            if (account.equals("oko") && transaction.equals("deposit")) {
-                balance.setOkoBalance(balance.getOkoBalance().add(cash));
-            } else if (account.equals("credit") && transaction.equals("deposit")) {
-                balance.setCreditBalance(balance.getCreditBalance().add(cash));
-            } else if (account.equals("oko") && transaction.equals("withdraw")) {
-                balance.setOkoBalance(balance.getOkoBalance().subtract(cash));
-            } else if (account.equals("credit") && transaction.equals("withdraw")) {
-                balance.setCreditBalance(balance.getCreditBalance().subtract(cash));
+        Balance balance = balanceRepository.findByAccountId(1L).orElseGet(() -> createNewBalance(1L));
+        updateAccountBalance(balance, cash, account, transaction);
+        balanceRepository.save(balance);
+    }
+
+    private Balance createNewBalance(long accountId) {
+        return Balance.builder()
+                .accountId(accountId)
+                .okoBalance(BigDecimal.ZERO)
+                .creditBalance(BigDecimal.ZERO)
+                .build();
+    }
+
+    private void updateAccountBalance(Balance balance, BigDecimal cash, String account, String transaction) {
+        switch (account) {
+            case "oko" -> {
+                if ("deposit".equals(transaction)) {
+                    balance.setOkoBalance(balance.getOkoBalance().add(cash));
+                } else if ("withdraw".equals(transaction)) {
+                    balance.setOkoBalance(balance.getOkoBalance().subtract(cash));
+                }
             }
-            balanceRepository.save(balance);
-        } else {
-            Balance emptyBalance = Balance.builder()
-                    .accountId(1L)
-                    .okoBalance(BigDecimal.valueOf(0))
-                    .creditBalance(BigDecimal.valueOf(0))
-                    .build();
-            if (account.equals("oko")) {
-                emptyBalance.setOkoBalance(cash);
-            } else if (account.equals("credit")) {
-                emptyBalance.setCreditBalance(cash);
+            case "credit" -> {
+                if ("deposit".equals(transaction)) {
+                    balance.setCreditBalance(balance.getCreditBalance().add(cash));
+                } else if ("withdraw".equals(transaction)) {
+                    balance.setCreditBalance(balance.getCreditBalance().subtract(cash));
+                }
             }
-            balanceRepository.save(emptyBalance);
         }
     }
 

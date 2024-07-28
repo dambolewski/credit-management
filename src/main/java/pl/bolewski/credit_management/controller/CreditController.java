@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bolewski.credit_management.dto.MonthVerifierDTO;
 import pl.bolewski.credit_management.dto.YearlyVerifierDTO;
-import pl.bolewski.credit_management.model.Money;
 import pl.bolewski.credit_management.service.CreditService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
