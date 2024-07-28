@@ -17,7 +17,7 @@ public class BalanceController {
 
     @PostMapping("/api/balance/add")
     public ResponseEntity<ApiResponse> addBalance(@RequestBody Balance balance) {
-        Balance savedBalance = balanceService.addBalance(balance);
+        balanceService.addBalance(balance);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("Balance added")
                 .status(200)

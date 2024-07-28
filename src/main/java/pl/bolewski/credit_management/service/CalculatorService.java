@@ -13,14 +13,18 @@ public class CalculatorService {
 
     private final BalanceRepository balanceRepository;
 
-    public void updateBalance(Long cash, String account) {
+    public void updateBalance(Long cash, String account, String transaction) {
         Optional<Balance> balanceOptional = balanceRepository.findByAccountId(1L);
         if (balanceOptional.isPresent()) {
             Balance balance = balanceOptional.get();
-            if (account.equals("oko")) {
+            if (account.equals("oko") && transaction.equals("deposit")) {
                 balance.setOkoBalance(balance.getOkoBalance() + cash);
-            } else if (account.equals("credit")) {
+            } else if (account.equals("credit") && transaction.equals("deposit")) {
                 balance.setCreditBalance(balance.getCreditBalance() + cash);
+            } else if (account.equals("oko") && transaction.equals("withdraw")) {
+                balance.setOkoBalance(balance.getOkoBalance() - cash);
+            } else if (account.equals("credit") && transaction.equals("withdraw")) {
+                balance.setCreditBalance(balance.getCreditBalance() - cash);
             }
             balanceRepository.save(balance);
         } else {

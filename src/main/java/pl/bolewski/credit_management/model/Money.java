@@ -22,4 +22,5 @@ public class Money {
     private String account;
     private String month;
     private LocalDate addedDate;
+    private String transaction;
 }
