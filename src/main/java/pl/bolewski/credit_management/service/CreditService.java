@@ -2,6 +2,7 @@ package pl.bolewski.credit_management.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.dto.MonthVerifierDTO;
 import pl.bolewski.credit_management.dto.YearlyVerifierDTO;
 import pl.bolewski.credit_management.model.Money;
@@ -24,12 +25,14 @@ public class CreditService {
     public final MoneyService moneyService;
     public final CalculatorService calculatorService;
 
+    @Transactional(readOnly = true)
     public MonthVerifierDTO checkMonthlyPayouts(String year, String month) {
         Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYearAndMonth(year, month);
         List<Money> moneyList = moneyListOptional.orElse(List.of());
         return createMonthVerifierDTO(month, moneyList);
     }
 
+    @Transactional(readOnly = true)
     public YearlyVerifierDTO checkYearlyPayouts(String year) {
         Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYear(year);
         List<Money> moneyList = moneyListOptional.orElse(List.of());

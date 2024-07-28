@@ -1,5 +1,6 @@
 package pl.bolewski.credit_management.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.bolewski.credit_management.model.Balance;
@@ -15,6 +16,7 @@ public class CalculatorService {
 
     private final BalanceRepository balanceRepository;
 
+    @Transactional
     public void updateBalance(BigDecimal cash, String account, String transaction) {
         Balance balance = balanceRepository.findByAccountId(1L).orElseGet(() -> createNewBalance(1L));
         updateAccountBalance(balance, cash, account, transaction);

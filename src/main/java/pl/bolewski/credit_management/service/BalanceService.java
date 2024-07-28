@@ -2,6 +2,7 @@ package pl.bolewski.credit_management.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.model.Balance;
 import pl.bolewski.credit_management.dto.BalanceDTO;
 import pl.bolewski.credit_management.repository.BalanceRepository;
@@ -14,12 +15,14 @@ public class BalanceService {
 
     private final BalanceRepository balanceRepository;
 
+    @Transactional
     public Balance addBalance(Balance balance) {
         return balanceRepository.findByAccountId(balance.getAccountId())
                 .map(exisitingBalance -> updateExistingBalance(exisitingBalance, balance))
                 .orElseGet(() -> balanceRepository.save(balance));
     }
 
+    @Transactional(readOnly = true)
     public BalanceDTO getWholeBalance() {
         return balanceRepository.findByAccountId(1L)
                 .map(this::toBalanceDTO)

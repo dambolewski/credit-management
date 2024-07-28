@@ -2,6 +2,7 @@ package pl.bolewski.credit_management.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.dto.MoneyDTO;
 import pl.bolewski.credit_management.model.Money;
 import pl.bolewski.credit_management.repository.MoneyRepository;
@@ -18,13 +19,29 @@ public class MoneyService {
     private final MoneyRepository moneyRepository;
     private final CalculatorService calculatorService;
 
-
+    @Transactional
     public void addMoney(MoneyDTO moneyDTO){
         processTransaction(moneyDTO, "deposit");
     }
 
+    @Transactional
     public void withdrawMoney(MoneyDTO moneyDTO){
         processTransaction(moneyDTO, "withdraw");
+    }
+
+    @Transactional(readOnly = true)
+    public List<Money> getMoney(){
+        return (List<Money>) moneyRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month) {
+        return moneyRepository.findByYearAndMonthAndAccount(year, month, "credit");
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<List<Money>> getMoneyByYear(String year) {
+        return moneyRepository.findByYearAndAccount(year, "credit");
     }
 
     private void processTransaction(MoneyDTO moneyDTO, String transaction) {
@@ -42,17 +59,5 @@ public class MoneyService {
 
     private void updateBalance(BigDecimal cash, String account, String transaction) {
         calculatorService.updateBalance(cash, account, transaction);
-    }
-
-    public List<Money> getMoney(){
-        return (List<Money>) moneyRepository.findAll();
-    }
-
-    public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month) {
-        return moneyRepository.findByYearAndMonthAndAccount(year, month, "credit");
-    }
-
-    public Optional<List<Money>> getMoneyByYear(String year) {
-        return moneyRepository.findByYearAndAccount(year, "credit");
     }
 }
