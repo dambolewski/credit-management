@@ -1,14 +1,10 @@
 package pl.bolewski.credit_management.service;
 
-import org.junit.AfterClass;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import pl.bolewski.credit_management.dto.MonthVerifierDTO;
 import pl.bolewski.credit_management.dto.YearlyVerifierDTO;
 import pl.bolewski.credit_management.model.Money;

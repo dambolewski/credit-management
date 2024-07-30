@@ -1,13 +1,9 @@
 package pl.bolewski.credit_management.service;
 
-import org.junit.AfterClass;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.model.Balance;
 import pl.bolewski.credit_management.model.Money;
 import pl.bolewski.credit_management.repository.BalanceRepository;
