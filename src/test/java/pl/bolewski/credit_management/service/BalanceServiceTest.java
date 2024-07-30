@@ -20,10 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 class BalanceServiceTest extends TestcontainersSetup {
 
+    private final BalanceService balanceService;
+    private final BalanceRepository balanceRepository;
+
     @Autowired
-    private BalanceService balanceService;
-    @Autowired
-    private BalanceRepository balanceRepository;
+    BalanceServiceTest(BalanceService balanceService, BalanceRepository balanceRepository) {
+        this.balanceService = balanceService;
+        this.balanceRepository = balanceRepository;
+    }
 
 
     @BeforeEach

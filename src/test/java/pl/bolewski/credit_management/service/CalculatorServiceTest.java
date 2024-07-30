@@ -22,10 +22,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 class CalculatorServiceTest extends TestcontainersSetup {
 
+    private final CalculatorService calculatorService;
+    private final BalanceRepository balanceRepository;
+
     @Autowired
-    private CalculatorService calculatorService;
-    @Autowired
-    private BalanceRepository balanceRepository;
+    CalculatorServiceTest(CalculatorService calculatorService, BalanceRepository balanceRepository) {
+        this.calculatorService = calculatorService;
+        this.balanceRepository = balanceRepository;
+    }
 
     @BeforeEach
     void setUp() {

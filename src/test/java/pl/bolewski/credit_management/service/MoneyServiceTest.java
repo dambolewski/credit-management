@@ -24,11 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 class MoneyServiceTest extends TestcontainersSetup {
 
-    @Autowired
-    private MoneyService moneyService;
+    private final MoneyService moneyService;
+    private final MoneyRepository moneyRepository;
 
     @Autowired
-    private MoneyRepository moneyRepository;
+    MoneyServiceTest(MoneyService moneyService, MoneyRepository moneyRepository) {
+        this.moneyService = moneyService;
+        this.moneyRepository = moneyRepository;
+    }
 
     @BeforeEach
     void setUp() {

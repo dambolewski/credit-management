@@ -24,11 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 class CreditServiceTest extends TestcontainersSetup {
 
-    @Autowired
-    private MoneyRepository moneyRepository;
+    private final MoneyRepository moneyRepository;
+    private final CreditService creditService;
 
     @Autowired
-    private CreditService creditService;
+    CreditServiceTest(MoneyRepository moneyRepository, CreditService creditService) {
+        this.moneyRepository = moneyRepository;
+        this.creditService = creditService;
+    }
 
 
     @BeforeEach

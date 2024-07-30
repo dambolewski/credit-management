@@ -16,8 +16,8 @@ public class BalanceService {
     private final BalanceRepository balanceRepository;
 
     @Transactional
-    public Balance addBalance(Balance balance) {
-        return balanceRepository.findByAccountId(balance.getAccountId())
+    public void addBalance(Balance balance) {
+        balanceRepository.findByAccountId(balance.getAccountId())
                 .map(exisitingBalance -> updateExistingBalance(exisitingBalance, balance))
                 .orElseGet(() -> balanceRepository.save(balance));
     }
