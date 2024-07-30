@@ -1,30 +1,96 @@
 package pl.bolewski.credit_management.service;
 
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.bolewski.credit_management.dto.MoneyDTO;
+import pl.bolewski.credit_management.model.Money;
+import pl.bolewski.credit_management.repository.MoneyRepository;
+import pl.bolewski.credit_management.testcontainers.TestcontainersSetup;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class MoneyServiceTest {
+@DirtiesContext
+class MoneyServiceTest extends TestcontainersSetup {
+
+    @Autowired
+    private MoneyService moneyService;
+
+    @Autowired
+    private MoneyRepository moneyRepository;
+
+    @BeforeEach
+    void setUp() {
+        moneyRepository.deleteAll();
+    }
 
     @Test
     void addMoney() {
+        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
+
+        moneyService.addMoney(moneyDTO);
+
+        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
+        assertFalse(moneyList.isEmpty());
+        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
     }
 
     @Test
     void withdrawMoney() {
+        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(500), "oko", "07");
+
+        moneyService.withdrawMoney(moneyDTO);
+
+        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
+        assertFalse(moneyList.isEmpty());
+        assertEquals(0, BigDecimal.valueOf(500).compareTo(moneyList.get(0).getCash()));
     }
 
     @Test
     void getMoney() {
+        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1500), "credit", "07");
+        moneyService.addMoney(moneyDTO);
+
+        List<Money> moneyList = moneyService.getMoney();
+
+        assertFalse(moneyList.isEmpty());
+        assertEquals(1, moneyList.size());
     }
 
     @Test
     void getMoneyByYearAndMonth() {
+        MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(1000), "credit", "07");
+        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "credit", "07");
+        moneyService.addMoney(moneyDTO1);
+        moneyService.addMoney(moneyDTO2);
+
+        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(String.valueOf(LocalDate.now().getYear()), "07");
+
+        assertTrue(result.isPresent());
+        assertEquals(2, result.get().size());
     }
 
     @Test
     void getMoneyByYear() {
+        MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(3000), "credit", "07");
+        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(4000), "credit", "08");
+        moneyService.addMoney(moneyDTO1);
+        moneyService.addMoney(moneyDTO2);
+
+        Optional<List<Money>> result = moneyService.getMoneyByYear(String.valueOf(LocalDate.now().getYear()));
+
+        assertTrue(result.isPresent());
+        assertEquals(2, result.get().size());
     }
 }
