@@ -35,14 +35,27 @@ class MoneyServiceTest extends TestcontainersSetup {
     }
 
     @Test
-    void addMoney() {
+    void depositMoney() {
         MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
 
-        moneyService.addMoney(moneyDTO);
+        moneyService.depositMoney(moneyDTO);
 
         List<Money> moneyList = (List<Money>) moneyRepository.findAll();
         assertFalse(moneyList.isEmpty());
         assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
+    }
+
+    @Test
+    void depositMoneyList() {
+        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
+        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "oko", "07");
+
+        moneyService.depositMoneyList(List.of(moneyDTO,moneyDTO2));
+
+        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
+        assertFalse(moneyList.isEmpty());
+        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
+        assertEquals(0, BigDecimal.valueOf(2000).compareTo(moneyList.get(1).getCash()));
     }
 
     @Test
@@ -59,7 +72,7 @@ class MoneyServiceTest extends TestcontainersSetup {
     @Test
     void getMoney() {
         MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1500), "credit", "07");
-        moneyService.addMoney(moneyDTO);
+        moneyService.depositMoney(moneyDTO);
 
         List<Money> moneyList = moneyService.getMoney();
 
@@ -71,8 +84,8 @@ class MoneyServiceTest extends TestcontainersSetup {
     void getMoneyByYearAndMonth() {
         MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(1000), "credit", "07");
         MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "credit", "07");
-        moneyService.addMoney(moneyDTO1);
-        moneyService.addMoney(moneyDTO2);
+        moneyService.depositMoney(moneyDTO1);
+        moneyService.depositMoney(moneyDTO2);
 
         Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(String.valueOf(LocalDate.now().getYear()), "07");
 
@@ -84,8 +97,8 @@ class MoneyServiceTest extends TestcontainersSetup {
     void getMoneyByYear() {
         MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(3000), "credit", "07");
         MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(4000), "credit", "08");
-        moneyService.addMoney(moneyDTO1);
-        moneyService.addMoney(moneyDTO2);
+        moneyService.depositMoney(moneyDTO1);
+        moneyService.depositMoney(moneyDTO2);
 
         Optional<List<Money>> result = moneyService.getMoneyByYear(String.valueOf(LocalDate.now().getYear()));
 

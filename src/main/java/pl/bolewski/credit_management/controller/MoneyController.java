@@ -20,11 +20,22 @@ public class MoneyController {
 
     private final MoneyService moneyService;
 
-    @PostMapping("/api/money/add")
-    public ResponseEntity<ApiResponse> addMoney(@RequestBody MoneyDTO moneyDTO) {
-        moneyService.addMoney(moneyDTO);
+    @PostMapping("/api/money/deposit")
+    public ResponseEntity<ApiResponse> depositMoney(@RequestBody MoneyDTO moneyDTO) {
+        moneyService.depositMoney(moneyDTO);
         ApiResponse apiResponse = ApiResponse.builder()
-                .message("Cash added")
+                .message("Money processed successfully")
+                .status(200)
+                .build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/api/money/deposit-list")
+    public ResponseEntity<ApiResponse> depositMoneyList(@RequestBody List<MoneyDTO> moneyDTOList) {
+        moneyService.depositMoneyList(moneyDTOList);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .message("Money list processed successfully")
                 .status(200)
                 .build();
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);

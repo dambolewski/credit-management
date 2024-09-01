@@ -20,8 +20,15 @@ public class MoneyService {
     private final CalculatorService calculatorService;
 
     @Transactional
-    public void addMoney(MoneyDTO moneyDTO){
+    public void depositMoney(MoneyDTO moneyDTO){
         processTransaction(moneyDTO, "deposit");
+    }
+
+    @Transactional
+    public void depositMoneyList(List<MoneyDTO> moneyDTOList) {
+        for (MoneyDTO moneyDTO : moneyDTOList) {
+            processTransaction(moneyDTO, "deposit");
+        }
     }
 
     @Transactional
