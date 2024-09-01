@@ -26,26 +26,26 @@ class MoneyControllerTest {
     private MoneyService moneyService;
 
     @Test
-    void addMoneyTest() throws Exception {
+    void depositMoneyTest() throws Exception {
         Mockito.doNothing().when(moneyService).depositMoney(Mockito.any(MoneyDTO.class));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Money processed successfully"))
+                .andExpect(jsonPath("$.message").value("DEPOSIT - Money processed successfully"))
                 .andExpect(jsonPath("$.status").value(200));
     }
 
     @Test
-    void addMoneyListTest() throws Exception {
+    void depositMoneyListTest() throws Exception {
         Mockito.doNothing().when(moneyService).depositMoneyList(Collections.singletonList(Mockito.any(MoneyDTO.class)));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/deposit-list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" },{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }]"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Money list processed successfully"))
+                .andExpect(jsonPath("$.message").value("DEPOSIT - Money list processed successfully"))
                 .andExpect(jsonPath("$.status").value(200));
     }
 
@@ -57,7 +57,19 @@ class MoneyControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Cash withdrew"))
+                .andExpect(jsonPath("$.message").value("WITHDRAW - Money processed successfully"))
+                .andExpect(jsonPath("$.status").value(200));
+    }
+
+    @Test
+    void withdrawMoneyListTest() throws Exception {
+        Mockito.doNothing().when(moneyService).withdrawMoneyList(Collections.singletonList(Mockito.any(MoneyDTO.class)));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/money/withdraw-list")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" },{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }]"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("WITHDRAW - Money list processed successfully"))
                 .andExpect(jsonPath("$.status").value(200));
     }
 

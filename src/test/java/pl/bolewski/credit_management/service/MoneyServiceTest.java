@@ -70,6 +70,19 @@ class MoneyServiceTest extends TestcontainersSetup {
     }
 
     @Test
+    void withdrawMoneyList() {
+        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
+        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "oko", "07");
+
+        moneyService.withdrawMoneyList(List.of(moneyDTO,moneyDTO2));
+
+        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
+        assertFalse(moneyList.isEmpty());
+        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
+        assertEquals(0, BigDecimal.valueOf(2000).compareTo(moneyList.get(1).getCash()));
+    }
+
+    @Test
     void getMoney() {
         MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1500), "credit", "07");
         moneyService.depositMoney(moneyDTO);

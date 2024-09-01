@@ -15,14 +15,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Setter
 @Getter
-public class Money {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private BigDecimal cash;
-    private String account;
-    private String month;
-    private String year;
-    private LocalDate addedDate;
-    private String transaction;
-}
+    public class Money {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Integer id;
+        private BigDecimal cash;
+        private String account;
+        private String month;
+        private String year;
+        private LocalDate addedDate;
+        private String transaction;
+    }

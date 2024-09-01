@@ -1,6 +1,7 @@
 package pl.bolewski.credit_management.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.dto.MoneyDTO;
@@ -36,9 +37,16 @@ public class MoneyService {
         processTransaction(moneyDTO, "withdraw");
     }
 
+    @Transactional
+    public void withdrawMoneyList(List<MoneyDTO> moneyDTOList){
+        for (MoneyDTO moneyDTO : moneyDTOList) {
+            processTransaction(moneyDTO, "withdraw");
+        }
+    }
+
     @Transactional(readOnly = true)
     public List<Money> getMoney(){
-        return (List<Money>) moneyRepository.findAll();
+        return moneyRepository.findAllByOrderByYearAscMonthDesc();
     }
 
     @Transactional(readOnly = true)
