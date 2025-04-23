@@ -45,7 +45,7 @@ public class MoneyService {
 
     @Transactional(readOnly = true)
     public List<Money> getMoney(){
-        return moneyRepository.findAllByOrderByYearAscMonthAsc();
+        return moneyRepository.findAllByOrderByAddedDateAsc();
     }
 
     @Transactional(readOnly = true)

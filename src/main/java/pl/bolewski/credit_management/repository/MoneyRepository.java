@@ -12,5 +12,5 @@ public interface MoneyRepository extends CrudRepository<Money, Integer> {
 
     Optional<List<Money>> findByYearAndAccount(String year, String account);
 
-    List<Money> findAllByOrderByYearAscMonthAsc();
+    List<Money> findAllByOrderByAddedDateAsc();
 }
