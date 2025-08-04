@@ -82,6 +82,6 @@ class CalculatorServiceTest {
         BigDecimal result = calculatorService.calculateMoneyInsideList(moneyList);
 
         // Then
-        assertEquals(BigDecimal.valueOf(1200), result);
+        assertEquals(0, BigDecimal.valueOf(1200).compareTo(result));
     }
 }

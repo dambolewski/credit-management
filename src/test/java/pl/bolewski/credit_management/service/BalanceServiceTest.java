@@ -67,8 +67,8 @@ class BalanceServiceTest {
 
         //Then
         verify(balanceRepository).save(existingBalance);
-        assertEquals(BigDecimal.valueOf(300), existingBalance.getOkoBalance());
-        assertEquals(BigDecimal.valueOf(400), existingBalance.getCreditBalance());
+        assertEquals(0, BigDecimal.valueOf(300).compareTo(existingBalance.getOkoBalance()));
+        assertEquals(0, BigDecimal.valueOf(400).compareTo(existingBalance.getCreditBalance()));
     }
 
     @ParameterizedTest(name = "getBalanceDto - oko={0}, credit={1}, exists={2}")
@@ -128,7 +128,7 @@ class BalanceServiceTest {
             "500, 500, 1000",
             "0, 0, 0"
     })
-    void getCombinedBalance(BigDecimal okoBalance, BigDecimal creditBalance, long expectedResult) {
+    void getCombinedBalance(BigDecimal okoBalance, BigDecimal creditBalance, BigDecimal expectedResult) {
         // Given
         Optional<Balance> repositoryReturn = okoBalance.equals(BigDecimal.ZERO) && creditBalance.equals(BigDecimal.ZERO) ?
                 Optional.empty() :
@@ -140,7 +140,7 @@ class BalanceServiceTest {
         when(balanceRepository.findByAccountId(1L)).thenReturn(repositoryReturn);
 
         // When
-        long result = balanceService.getCombinedBalance();
+        BigDecimal result = balanceService.getCombinedBalance();
 
         // Then
         assertEquals(expectedResult, result);

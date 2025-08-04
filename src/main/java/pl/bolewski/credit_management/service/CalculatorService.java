@@ -26,14 +26,14 @@ public class CalculatorService {
         balanceRepository.save(balance);
     }
 
-    private void updateAccountBalance(Balance balance, BigDecimal cash, AccountType account, TransactionType transactionType) {
+    private void updateAccountBalance(Balance balance, BigDecimal cash, AccountType accountType, TransactionType transactionType) {
         BigDecimal newAmount = switch (transactionType) {
             case DEPOSIT -> cash;
             case WITHDRAW -> cash.negate();
         };
 
-        switch (account) {
-            case OKO -> balance.setOkoBalance(balance.getOkoBalance().add(newAmount));
+        switch (accountType) {
+            case OKO, TREASURY_BOND -> balance.setOkoBalance(balance.getOkoBalance().add(newAmount));
             case CREDIT -> balance.setCreditBalance(balance.getCreditBalance().add(newAmount));
         }
     }

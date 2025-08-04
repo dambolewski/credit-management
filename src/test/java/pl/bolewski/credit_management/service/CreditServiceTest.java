@@ -50,7 +50,7 @@ class CreditServiceTest {
                 Optional.empty() :
                 Optional.of(moneyList);
 
-        when(moneyService.getMoneyByYearAndMonth("2024", month)).thenReturn(moneyListOptional);
+        when(moneyService.getMoneyByYearAndMonth("2024", month, AccountType.CREDIT)).thenReturn(moneyListOptional);
         when(calculatorService.calculateMoneyInsideList(anyList())).thenReturn(collected);
 
         // When
@@ -58,11 +58,11 @@ class CreditServiceTest {
 
         // Then
         assertEquals(month, result.getMonth());
-        assertEquals(BigDecimal.valueOf(1835), result.getNeeded()); // MONTHLY_TARGET
+        assertEquals(0, BigDecimal.valueOf(1835).compareTo(result.getNeeded()));
         assertEquals(collected, result.getCollected());
         assertEquals(expectedStatus, result.getStatus());
 
-        verify(moneyService).getMoneyByYearAndMonth("2024", month);
+        verify(moneyService).getMoneyByYearAndMonth("2024", month, AccountType.CREDIT);
         verify(calculatorService).calculateMoneyInsideList(anyList());
     }
 
@@ -76,7 +76,7 @@ class CreditServiceTest {
         // Given
         List<Money> moneyList = List.of(createTestMoney(collected.intValue(), AccountType.CREDIT, "01", year, TransactionType.DEPOSIT));
 
-        when(moneyService.getMoneyByYear(year)).thenReturn(Optional.of(moneyList));
+        when(moneyService.getMoneyByYear(year, AccountType.CREDIT)).thenReturn(Optional.of(moneyList));
         when(calculatorService.calculateMoneyInsideList(moneyList)).thenReturn(collected);
 
         // When

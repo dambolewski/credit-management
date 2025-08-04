@@ -64,7 +64,7 @@ class BalanceControllerTest {
 
     @Test
     void getCombinedBalanceTest() throws Exception {
-        Mockito.when(balanceService.getCombinedBalance()).thenReturn(10000L);
+        Mockito.when(balanceService.getCombinedBalance()).thenReturn(BigDecimal.valueOf(10000));
 
         mockMvc.perform(get("/api/balance/getCombinedBalance"))
                 .andExpect(status().isOk())

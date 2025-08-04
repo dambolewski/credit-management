@@ -36,11 +36,11 @@ public class BalanceService {
     }
 
     @Transactional(readOnly = true)
-    public long getCombinedBalance() {
+    public BigDecimal getCombinedBalance() {
         BalanceDTO balanceDto = balanceRepository.findByAccountId(1L)
                 .map(this::toBalanceDTO)
                 .orElseGet(this::createEmptyBalanceDTO);
-        return balanceDto.getCreditBalance().add(balanceDto.getOkoBalance()).longValue();
+        return balanceDto.getCreditBalance().add(balanceDto.getOkoBalance());
     }
 
     private Balance updateExistingBalance(Balance exisitingBalance, Balance balance) {

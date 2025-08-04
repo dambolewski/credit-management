@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.dto.MonthVerifierDTO;
 import pl.bolewski.credit_management.dto.YearlyVerifierDTO;
+import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Money;
 
 import java.math.BigDecimal;
@@ -19,19 +20,19 @@ public class CreditService {
     private static final BigDecimal YEARLY_TARGET_2024 = BigDecimal.valueOf(16515);
     private static final BigDecimal YEARLY_TARGET_DEFAULT = BigDecimal.valueOf(22020);
 
-    public final MoneyService moneyService;
-    public final CalculatorService calculatorService;
+    private final MoneyService moneyService;
+    private final CalculatorService calculatorService;
 
     @Transactional(readOnly = true)
     public MonthVerifierDTO checkMonthlyPayouts(String year, String month) {
-        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYearAndMonth(year, month);
+        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
         List<Money> moneyList = moneyListOptional.orElse(List.of());
         return createMonthVerifierDTO(month, moneyList);
     }
 
     @Transactional(readOnly = true)
     public YearlyVerifierDTO checkYearlyPayouts(String year) {
-        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYear(year);
+        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYear(year, AccountType.CREDIT);
         List<Money> moneyList = moneyListOptional.orElse(List.of());
         return createYearlyVerifierDTO(year, moneyList);
     }

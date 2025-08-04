@@ -52,13 +52,18 @@ public class MoneyService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month) {
-        return moneyRepository.findByYearAndMonthAndAccountType(year, month, AccountType.CREDIT);
+    public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month, AccountType accountType) {
+        return moneyRepository.findByYearAndMonthAndAccountType(year, month, accountType);
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Money>> getMoneyByYear(String year) {
-        return moneyRepository.findByYearAndAccountType(year, AccountType.CREDIT);
+    public Optional<List<Money>> getMoneyByYear(String year, AccountType accountType) {
+        return moneyRepository.findByYearAndAccountType(year, accountType);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<List<Money>> getMoneyByAccountType(AccountType accountType) {
+        return moneyRepository.findByAccountType(accountType);
     }
 
     private void processTransaction(MoneyDTO moneyDTO, TransactionType transactionType) {

@@ -9,6 +9,8 @@ import pl.bolewski.credit_management.dto.BalanceDTO;
 import pl.bolewski.credit_management.response.ApiResponse;
 import pl.bolewski.credit_management.service.BalanceService;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequiredArgsConstructor
 public class BalanceController {
@@ -31,7 +33,7 @@ public class BalanceController {
     }
 
     @GetMapping("/api/balance/getCombinedBalance")
-    public long getCombinedBalance() {
+    public BigDecimal getCombinedBalance() {
         return balanceService.getCombinedBalance();
     }
 }

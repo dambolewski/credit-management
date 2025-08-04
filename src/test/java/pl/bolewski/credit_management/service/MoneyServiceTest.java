@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 import pl.bolewski.credit_management.dto.MoneyDTO;
 import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Money;
@@ -131,7 +132,7 @@ class MoneyServiceTest extends TestcontainersSetup {
                 .thenReturn(mockResult);
 
         // When
-        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(year, month);
+        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
 
         // Then
         assertEquals(hasData, result.isPresent());
@@ -158,7 +159,7 @@ class MoneyServiceTest extends TestcontainersSetup {
         when(moneyRepository.findByYearAndAccountType(year, AccountType.CREDIT)).thenReturn(mockResult);
 
         // When
-        Optional<List<Money>> result = moneyService.getMoneyByYear(year);
+        Optional<List<Money>> result = moneyService.getMoneyByYear(year, AccountType.CREDIT);
 
         // Then
         assertEquals(hasData, result.isPresent());

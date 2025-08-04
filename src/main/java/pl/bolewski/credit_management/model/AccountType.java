@@ -1,5 +1,5 @@
 package pl.bolewski.credit_management.model;
 
 public enum AccountType {
-    OKO, CREDIT
+    OKO, CREDIT, TREASURY_BOND
 }
