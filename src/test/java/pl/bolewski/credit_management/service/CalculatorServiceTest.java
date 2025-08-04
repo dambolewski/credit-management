@@ -1,87 +1,102 @@
 package pl.bolewski.credit_management.service;
 
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Balance;
 import pl.bolewski.credit_management.model.Money;
+import pl.bolewski.credit_management.model.TransactionType;
 import pl.bolewski.credit_management.repository.BalanceRepository;
-import pl.bolewski.credit_management.testcontainers.TestcontainersSetup;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@DirtiesContext
-class CalculatorServiceTest extends TestcontainersSetup {
+@ExtendWith(MockitoExtension.class)
+class CalculatorServiceTest {
 
-    private final CalculatorService calculatorService;
-    private final BalanceRepository balanceRepository;
+    @InjectMocks
+    CalculatorService calculatorService;
+    @Mock
+    BalanceService balanceService;
+    @Mock
+    BalanceRepository balanceRepository;
 
-    @Autowired
-    CalculatorServiceTest(CalculatorService calculatorService, BalanceRepository balanceRepository) {
-        this.calculatorService = calculatorService;
-        this.balanceRepository = balanceRepository;
+    @ParameterizedTest(name = "{1} {2} of {0} - Initial(OKO={3}, CREDIT={4}) -> Expected(OKO={5}, CREDIT={6})")
+    @CsvSource({
+            "1000, OKO, DEPOSIT, 0, 0, 1000, 0",
+            "500, OKO, WITHDRAW, 1000, 0, 500, 0",
+            "1000, CREDIT, DEPOSIT, 0, 0, 0, 1000",
+            "500, CREDIT, WITHDRAW, 0, 1000, 0, 500"
+    })
+    void updateBalance(BigDecimal amount, AccountType accountType, TransactionType transactionType,
+                       BigDecimal initialOkoBalance, BigDecimal initialCreditBalance,
+                       BigDecimal expectedOkoBalance, BigDecimal expectedCreditBalance) {
+        // Given
+        Balance balance = Balance.builder()
+                .accountId(1L)
+                .okoBalance(initialOkoBalance)
+                .creditBalance(initialCreditBalance)
+                .build();
+        when(balanceService.getBalance()).thenReturn(balance);
+
+        // When
+        calculatorService.updateBalance(amount, accountType, transactionType);
+
+        // Then
+        ArgumentCaptor<Balance> balanceCaptor = ArgumentCaptor.forClass(Balance.class);
+        verify(balanceRepository).save(balanceCaptor.capture());
+
+        Balance capturedBalance = balanceCaptor.getValue();
+        assertEquals(expectedOkoBalance, capturedBalance.getOkoBalance());
+        assertEquals(expectedCreditBalance, capturedBalance.getCreditBalance());
     }
 
-    @BeforeEach
-    void setUp() {
-        balanceRepository.deleteAll();
-    }
+    @Test
+    void updateBalance_throwsExceptionForNullAccountType() {
+        // Given
+        Balance balance = Balance.builder()
+                .accountId(1L)
+                .okoBalance(BigDecimal.ZERO)
+                .creditBalance(BigDecimal.ZERO)
+                .build();
+        when(balanceService.getBalance()).thenReturn(balance);
 
-
-    @Nested
-    class updateBalanceTests {
-
-        @Test
-        void updateBalanceOkoAccount(){
-            BigDecimal depositAmount = BigDecimal.valueOf(1000);
-            BigDecimal withdrawAmount = BigDecimal.valueOf(500);
-
-            calculatorService.updateBalance(depositAmount, "oko", "deposit");
-
-            Balance balance = balanceRepository.findByAccountId(1L).orElseThrow();
-            assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance.getOkoBalance()));
-
-            calculatorService.updateBalance(withdrawAmount, "oko", "withdraw");
-
-            balance = balanceRepository.findByAccountId(1L).orElseThrow();
-            assertEquals(0, BigDecimal.valueOf(500).compareTo(balance.getOkoBalance()));
-        }
-
-        @Test
-        void updateBalanceCreditAccount(){
-            BigDecimal depositAmount = BigDecimal.valueOf(1000);
-            BigDecimal withdrawAmount = BigDecimal.valueOf(500);
-
-            calculatorService.updateBalance(depositAmount, "credit", "deposit");
-
-            Balance balance = balanceRepository.findByAccountId(1L).orElseThrow();
-            assertEquals(0, BigDecimal.valueOf(1000).compareTo(balance.getCreditBalance()));
-
-            calculatorService.updateBalance(withdrawAmount, "credit", "withdraw");
-
-            balance = balanceRepository.findByAccountId(1L).orElseThrow();
-            assertEquals(0, BigDecimal.valueOf(500).compareTo(balance.getCreditBalance()));
-        }
-
+        // When & Then
+        assertThrows(NullPointerException.class, () ->
+                calculatorService.updateBalance(BigDecimal.valueOf(100), null, TransactionType.DEPOSIT));
     }
 
     @Test
     void calculateMoneyInsideList() {
-
-        Money deposit1 = Money.builder().cash(BigDecimal.valueOf(1000)).transaction("deposit").build();
-        Money deposit2 = Money.builder().cash(BigDecimal.valueOf(500)).transaction("deposit").build();
-        Money withdraw = Money.builder().cash(BigDecimal.valueOf(300)).transaction("withdraw").build();
+        // Given
+        Money deposit1 = Money.builder()
+                .cash(BigDecimal.valueOf(1000))
+                .transactionType(TransactionType.DEPOSIT)
+                .build();
+        Money deposit2 = Money.builder()
+                .cash(BigDecimal.valueOf(500))
+                .transactionType(TransactionType.DEPOSIT)
+                .build();
+        Money withdraw = Money.builder()
+                .cash(BigDecimal.valueOf(300))
+                .transactionType(TransactionType.WITHDRAW)
+                .build();
 
         List<Money> moneyList = List.of(deposit1, deposit2, withdraw);
 
+        // When
         BigDecimal result = calculatorService.calculateMoneyInsideList(moneyList);
 
-        assertEquals(0, BigDecimal.valueOf(1200).compareTo(result));
-
+        // Then
+        assertEquals(BigDecimal.valueOf(1200), result);
     }
 }

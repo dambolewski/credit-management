@@ -1,6 +1,7 @@
 package pl.bolewski.credit_management.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Money;
 
 import java.util.List;
@@ -8,9 +9,9 @@ import java.util.Optional;
 
 public interface MoneyRepository extends CrudRepository<Money, Integer> {
 
-    Optional<List<Money>> findByYearAndMonthAndAccount(String year, String month, String account);
+    Optional<List<Money>> findByYearAndMonthAndAccountType(String year, String month, AccountType account);
 
-    Optional<List<Money>> findByYearAndAccount(String year, String account);
+    Optional<List<Money>> findByYearAndAccountType(String year, AccountType account);
 
-    List<Money> findAllByOrderByAddedDateAsc();
+    List<Money> findAllByOrderByAddedAtDesc();
 }

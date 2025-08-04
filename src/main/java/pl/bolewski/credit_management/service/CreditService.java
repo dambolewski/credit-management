@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.bolewski.credit_management.dto.MonthVerifierDTO;
 import pl.bolewski.credit_management.dto.YearlyVerifierDTO;
 import pl.bolewski.credit_management.model.Money;
-import pl.bolewski.credit_management.repository.MoneyRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,8 +19,6 @@ public class CreditService {
     private static final BigDecimal YEARLY_TARGET_2024 = BigDecimal.valueOf(16515);
     private static final BigDecimal YEARLY_TARGET_DEFAULT = BigDecimal.valueOf(22020);
 
-
-    public final MoneyRepository moneyRepository;
     public final MoneyService moneyService;
     public final CalculatorService calculatorService;
 

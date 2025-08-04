@@ -1,108 +1,148 @@
 package pl.bolewski.credit_management.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pl.bolewski.credit_management.dto.BalanceDTO;
 import pl.bolewski.credit_management.model.Balance;
 import pl.bolewski.credit_management.repository.BalanceRepository;
-import pl.bolewski.credit_management.testcontainers.TestcontainersSetup;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@DirtiesContext
-class BalanceServiceTest extends TestcontainersSetup {
+@ExtendWith(MockitoExtension.class)
+class BalanceServiceTest {
 
-    private final BalanceService balanceService;
-    private final BalanceRepository balanceRepository;
+    @InjectMocks
+    BalanceService balanceService;
+    @Mock
+    BalanceRepository balanceRepository;
 
-    @Autowired
-    BalanceServiceTest(BalanceService balanceService, BalanceRepository balanceRepository) {
-        this.balanceService = balanceService;
-        this.balanceRepository = balanceRepository;
+
+    @Test
+    void addBalance_createsNewBalance() {
+        //Given
+        Balance balance = Balance.builder()
+                .accountId(1L)
+                .okoBalance(BigDecimal.valueOf(1000))
+                .creditBalance(BigDecimal.valueOf(500))
+                .build();
+        when(balanceRepository.findByAccountId(1L)).thenReturn(Optional.empty());
+
+        //When
+        balanceService.addBalance(balance);
+
+        //Then
+        verify(balanceRepository).findByAccountId(1L);
+        verify(balanceRepository).save(balance);
     }
 
+    @Test
+    void addBalance_updatesExistingBalance() {
+        //Given
+        Balance existingBalance = Balance.builder()
+                .id(1L).accountId(1L)
+                .okoBalance(BigDecimal.valueOf(100))
+                .creditBalance(BigDecimal.valueOf(200))
+                .build();
 
-    @BeforeEach
-    void setUp() {
-        balanceRepository.deleteAll();
+        Balance newBalance = Balance.builder()
+                .accountId(1L)
+                .okoBalance(BigDecimal.valueOf(300))
+                .creditBalance(BigDecimal.valueOf(400))
+                .build();
+
+        when(balanceRepository.findByAccountId(1L)).thenReturn(Optional.of(existingBalance));
+
+        //When
+        balanceService.addBalance(newBalance);
+
+        //Then
+        verify(balanceRepository).save(existingBalance);
+        assertEquals(BigDecimal.valueOf(300), existingBalance.getOkoBalance());
+        assertEquals(BigDecimal.valueOf(400), existingBalance.getCreditBalance());
     }
 
-    @Nested
-    class addBalance {
+    @ParameterizedTest(name = "getBalanceDto - oko={0}, credit={1}, exists={2}")
+    @CsvSource({
+            "1000, 500, true",
+            "0, 0, false"
+    })
+    void getBalanceDto(BigDecimal okoBalance, BigDecimal creditBalance, boolean balanceExists) {
+        // Given
+        Optional<Balance> repositoryReturn = balanceExists ?
+                Optional.of(Balance.builder()
+                        .accountId(1L)
+                        .okoBalance(okoBalance)
+                        .creditBalance(creditBalance)
+                        .build()) :
+                Optional.empty();
 
-        @Test
-        void createsBalance() {
-            Balance balance = new Balance();
-            balance.setAccountId(1L);
-            balance.setOkoBalance(BigDecimal.valueOf(1000));
-            balance.setCreditBalance(BigDecimal.valueOf(500));
+        when(balanceRepository.findByAccountId(1L)).thenReturn(repositoryReturn);
 
-            balanceService.addBalance(balance);
+        // When
+        BalanceDTO balanceDTO = balanceService.getBalanceDto();
 
-            Optional<Balance> fetchedBalance = balanceRepository.findByAccountId(1L);
-            assertTrue(fetchedBalance.isPresent());
-            assertEquals(0, BigDecimal.valueOf(1000).compareTo(fetchedBalance.get().getOkoBalance()));
-            assertEquals(0, BigDecimal.valueOf(500).compareTo(fetchedBalance.get().getCreditBalance()));
-        }
-
-        @Test
-        void createsNewWhenAlreadyExist() {
-            Balance existingBalance = new Balance();
-            existingBalance.setAccountId(1L);
-            existingBalance.setOkoBalance(BigDecimal.valueOf(500));
-            existingBalance.setCreditBalance(BigDecimal.valueOf(250));
-            balanceRepository.save(existingBalance);
-
-            Balance newBalance = new Balance();
-            newBalance.setAccountId(1L);
-            newBalance.setOkoBalance(BigDecimal.valueOf(1000));
-            newBalance.setCreditBalance(BigDecimal.valueOf(500));
-
-            balanceService.addBalance(newBalance);
-
-            Optional<Balance> fetchedBalance = balanceRepository.findByAccountId(1L);
-            assertTrue(fetchedBalance.isPresent());
-            assertEquals(0, BigDecimal.valueOf(1000).compareTo(fetchedBalance.get().getOkoBalance()));
-            assertEquals(0, BigDecimal.valueOf(500).compareTo(fetchedBalance.get().getCreditBalance()));
-        }
-
-        @Test
-        void returnsEmptyWhenNoBalance() {
-            BalanceDTO balanceDTO = balanceService.getWholeBalance();
-            assertEquals(BigDecimal.ZERO, balanceDTO.getOkoBalance());
-            assertEquals(BigDecimal.ZERO, balanceDTO.getCreditBalance());
-        }
-
+        // Then
+        assertEquals(okoBalance, balanceDTO.getOkoBalance());
+        assertEquals(creditBalance, balanceDTO.getCreditBalance());
     }
 
-    @Nested
-    class getWholeBalance {
-        @Test
-        void returnsWhenBalance() {
-            Balance balance = new Balance();
-            balance.setAccountId(1L);
-            balance.setOkoBalance(BigDecimal.valueOf(1000));
-            balance.setCreditBalance(BigDecimal.valueOf(500));
-            balanceRepository.save(balance);
+    @ParameterizedTest(name = "getBalance - {0}")
+    @CsvSource({
+            "true, 1000, 500",
+            "false, 0, 0"
+    })
+    void getBalance(boolean balanceExists, BigDecimal expectedOkoBalance, BigDecimal expectedCreditBalance) {
+        // Given
+        Optional<Balance> repositoryReturn = balanceExists ?
+                Optional.of(Balance.builder()
+                        .accountId(1L)
+                        .okoBalance(expectedOkoBalance)
+                        .creditBalance(expectedCreditBalance)
+                        .build()) :
+                Optional.empty();
 
-            BalanceDTO balanceDTO = balanceService.getWholeBalance();
-            assertEquals(0, BigDecimal.valueOf(1000).compareTo(balanceDTO.getOkoBalance()));
-            assertEquals(0, BigDecimal.valueOf(500).compareTo(balanceDTO.getCreditBalance()));
-        }
+        when(balanceRepository.findByAccountId(1L)).thenReturn(repositoryReturn);
 
-        @Test
-        void returnsEmptyWhenNoBalance() {
-            BalanceDTO balanceDTO = balanceService.getWholeBalance();
-            assertEquals(BigDecimal.ZERO, balanceDTO.getOkoBalance());
-            assertEquals(BigDecimal.ZERO, balanceDTO.getCreditBalance());
-        }
+        // When
+        Balance result = balanceService.getBalance();
+
+        // Then
+        assertEquals(1L, result.getAccountId());
+        assertEquals(expectedOkoBalance, result.getOkoBalance());
+        assertEquals(expectedCreditBalance, result.getCreditBalance());
+        verify(balanceRepository).findByAccountId(1L);
+    }
+
+    @ParameterizedTest(name = "getCombinedBalance - oko={0}, credit={1}, expected={2}")
+    @CsvSource({
+            "500, 500, 1000",
+            "0, 0, 0"
+    })
+    void getCombinedBalance(BigDecimal okoBalance, BigDecimal creditBalance, long expectedResult) {
+        // Given
+        Optional<Balance> repositoryReturn = okoBalance.equals(BigDecimal.ZERO) && creditBalance.equals(BigDecimal.ZERO) ?
+                Optional.empty() :
+                Optional.of(Balance.builder()
+                        .okoBalance(okoBalance)
+                        .creditBalance(creditBalance)
+                        .build());
+
+        when(balanceRepository.findByAccountId(1L)).thenReturn(repositoryReturn);
+
+        // When
+        long result = balanceService.getCombinedBalance();
+
+        // Then
+        assertEquals(expectedResult, result);
     }
 }

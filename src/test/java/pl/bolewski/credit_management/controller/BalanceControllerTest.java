@@ -16,8 +16,7 @@ import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BalanceController.class)
 class BalanceControllerTest {
@@ -49,17 +48,26 @@ class BalanceControllerTest {
     }
 
     @Test
-    void getWholeBalanceTest() throws Exception {
+    void getBalanceTest() throws Exception {
         BalanceDTO balanceDTO = BalanceDTO.builder()
                 .okoBalance(BigDecimal.valueOf(1000))
                 .creditBalance(BigDecimal.valueOf(500))
                 .build();
 
-        Mockito.when(balanceService.getWholeBalance()).thenReturn(balanceDTO);
+        Mockito.when(balanceService.getBalanceDto()).thenReturn(balanceDTO);
 
         mockMvc.perform(get("/api/balance/getBalance"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.okoBalance").value(1000))
                 .andExpect(jsonPath("$.creditBalance").value(500));
+    }
+
+    @Test
+    void getCombinedBalanceTest() throws Exception {
+        Mockito.when(balanceService.getCombinedBalance()).thenReturn(10000L);
+
+        mockMvc.perform(get("/api/balance/getCombinedBalance"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("10000"));
     }
 }

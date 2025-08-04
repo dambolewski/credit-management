@@ -27,6 +27,11 @@ public class BalanceController {
 
     @GetMapping("/api/balance/getBalance")
     public BalanceDTO getWholeBalance() {
-        return balanceService.getWholeBalance();
+        return balanceService.getBalanceDto();
+    }
+
+    @GetMapping("/api/balance/getCombinedBalance")
+    public long getCombinedBalance() {
+        return balanceService.getCombinedBalance();
     }
 }

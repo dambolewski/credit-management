@@ -1,13 +1,10 @@
 package pl.bolewski.credit_management.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -20,9 +17,13 @@ import java.time.LocalDate;
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
         private BigDecimal cash;
-        private String account;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "account")
+        private AccountType accountType;
         private String month;
         private String year;
-        private LocalDate addedDate;
-        private String transaction;
+        private LocalDateTime addedAt;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "transaction")
+        private TransactionType transactionType;
     }

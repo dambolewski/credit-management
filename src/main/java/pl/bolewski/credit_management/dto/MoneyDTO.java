@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.bolewski.credit_management.model.AccountType;
 
 import java.math.BigDecimal;
 
@@ -13,6 +14,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MoneyDTO {
     private BigDecimal cash;
-    private String account;
+    private AccountType accountType;
     private String month;
 }

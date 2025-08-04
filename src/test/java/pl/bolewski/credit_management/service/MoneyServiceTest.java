@@ -1,121 +1,184 @@
 package pl.bolewski.credit_management.service;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import pl.bolewski.credit_management.dto.MoneyDTO;
+import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Money;
+import pl.bolewski.credit_management.model.TransactionType;
 import pl.bolewski.credit_management.repository.MoneyRepository;
 import pl.bolewski.credit_management.testcontainers.TestcontainersSetup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@DirtiesContext
+@ExtendWith(MockitoExtension.class)
 class MoneyServiceTest extends TestcontainersSetup {
 
-    private final MoneyService moneyService;
-    private final MoneyRepository moneyRepository;
+    @InjectMocks
+    MoneyService moneyService;
+    @Mock
+    MoneyRepository moneyRepository;
+    @Mock
+    CalculatorService calculatorService;
 
-    @Autowired
-    MoneyServiceTest(MoneyService moneyService, MoneyRepository moneyRepository) {
-        this.moneyService = moneyService;
-        this.moneyRepository = moneyRepository;
+    @ParameterizedTest(name = "processTransaction - {0} {1} of {2} in month {3}")
+    @CsvSource({
+            "DEPOSIT, OKO, 1000, 07",
+            "DEPOSIT, CREDIT, 1500, 08",
+            "WITHDRAW, OKO, 500, 09",
+            "WITHDRAW, CREDIT, 750, 10"
+    })
+    void processTransaction(TransactionType transactionType, AccountType accountType,
+                            BigDecimal amount, String month) {
+        // Given
+        MoneyDTO moneyDTO = new MoneyDTO(amount, accountType, month);
+
+        // When
+        if (transactionType == TransactionType.DEPOSIT) {
+            moneyService.depositMoney(moneyDTO);
+        } else {
+            moneyService.withdrawMoney(moneyDTO);
+        }
+
+        // Then
+        ArgumentCaptor<Money> moneyCaptor = ArgumentCaptor.forClass(Money.class);
+        verify(moneyRepository).save(moneyCaptor.capture());
+        verify(calculatorService).updateBalance(amount, accountType, transactionType);
+
+        Money savedMoney = moneyCaptor.getValue();
+        assertEquals(amount, savedMoney.getCash());
+        assertEquals(accountType, savedMoney.getAccountType());
+        assertEquals(month, savedMoney.getMonth());
+        assertEquals(String.valueOf(LocalDate.now().getYear()), savedMoney.getYear());
+        assertEquals(transactionType, savedMoney.getTransactionType());
+        assertNotNull(savedMoney.getAddedAt());
     }
 
-    @BeforeEach
-    void setUp() {
-        moneyRepository.deleteAll();
-    }
+    @ParameterizedTest(name = "processTransactionList - {0} {1} amounts=[{2},{3}] month={4}")
+    @CsvSource({
+            "DEPOSIT, OKO, 1000, 400, 07",
+            "DEPOSIT, CREDIT, 1500, 800, 08",
+            "WITHDRAW, OKO, 500, 750, 09"
+    })
+    void processTransactionList(TransactionType transactionType, AccountType accountType,
+                                BigDecimal amount1, BigDecimal amount2, String month) {
+        // Given
+        List<MoneyDTO> moneyDTOList = List.of(
+                new MoneyDTO(amount1, accountType, month),
+                new MoneyDTO(amount2, accountType, month)
+        );
 
-    @Test
-    void depositMoney() {
-        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
+        // When
+        if (transactionType == TransactionType.DEPOSIT) {
+            moneyService.depositMoneyList(moneyDTOList);
+        } else {
+            moneyService.withdrawMoneyList(moneyDTOList);
+        }
 
-        moneyService.depositMoney(moneyDTO);
+        // Then
+        ArgumentCaptor<Money> moneyCaptor = ArgumentCaptor.forClass(Money.class);
+        verify(moneyRepository, times(2)).save(moneyCaptor.capture());
 
-        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
-        assertFalse(moneyList.isEmpty());
-        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
-    }
+        List<Money> savedMoneyList = moneyCaptor.getAllValues();
 
-    @Test
-    void depositMoneyList() {
-        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
-        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "oko", "07");
-
-        moneyService.depositMoneyList(List.of(moneyDTO,moneyDTO2));
-
-        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
-        assertFalse(moneyList.isEmpty());
-        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
-        assertEquals(0, BigDecimal.valueOf(2000).compareTo(moneyList.get(1).getCash()));
-    }
-
-    @Test
-    void withdrawMoney() {
-        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(500), "oko", "07");
-
-        moneyService.withdrawMoney(moneyDTO);
-
-        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
-        assertFalse(moneyList.isEmpty());
-        assertEquals(0, BigDecimal.valueOf(500).compareTo(moneyList.get(0).getCash()));
-    }
-
-    @Test
-    void withdrawMoneyList() {
-        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1000), "oko", "07");
-        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "oko", "07");
-
-        moneyService.withdrawMoneyList(List.of(moneyDTO,moneyDTO2));
-
-        List<Money> moneyList = (List<Money>) moneyRepository.findAll();
-        assertFalse(moneyList.isEmpty());
-        assertEquals(0, BigDecimal.valueOf(1000).compareTo(moneyList.get(0).getCash()));
-        assertEquals(0, BigDecimal.valueOf(2000).compareTo(moneyList.get(1).getCash()));
+        assertEquals(0, amount1.compareTo(savedMoneyList.get(0).getCash()));
+        assertEquals(0, amount2.compareTo(savedMoneyList.get(1).getCash()));
     }
 
     @Test
     void getMoney() {
-        MoneyDTO moneyDTO = new MoneyDTO(BigDecimal.valueOf(1500), "credit", "07");
-        moneyService.depositMoney(moneyDTO);
+        // Given
+        List<Money> mockMoneyList = List.of(
+                createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, "07"),
+                createMockMoney(BigDecimal.valueOf(500), AccountType.OKO, "08")
+        );
+        when(moneyRepository.findAllByOrderByAddedAtDesc()).thenReturn(mockMoneyList);
 
-        List<Money> moneyList = moneyService.getMoney();
+        // When
+        List<Money> result = moneyService.getMoney();
 
-        assertFalse(moneyList.isEmpty());
-        assertEquals(1, moneyList.size());
+        // Then
+        assertEquals(2, result.size());
+        assertEquals(mockMoneyList, result);
+        verify(moneyRepository).findAllByOrderByAddedAtDesc();
     }
 
-    @Test
-    void getMoneyByYearAndMonth() {
-        MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(1000), "credit", "07");
-        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(2000), "credit", "07");
-        moneyService.depositMoney(moneyDTO1);
-        moneyService.depositMoney(moneyDTO2);
+    @ParameterizedTest(name = "getMoneyByYearAndMonth - year={0}, month={1}, hasData={2}")
+    @CsvSource({
+            "2024, 07, true",
+            "2024, 08, false"
+    })
+    void getMoneyByYearAndMonth(String year, String month, boolean hasData) {
+        // Given
+        Optional<List<Money>> mockResult = hasData ?
+                Optional.of(List.of(createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, month))) :
+                Optional.empty();
 
-        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(String.valueOf(LocalDate.now().getYear()), "07");
+        when(moneyRepository.findByYearAndMonthAndAccountType(year, month, AccountType.CREDIT))
+                .thenReturn(mockResult);
 
-        assertTrue(result.isPresent());
-        assertEquals(2, result.get().size());
+        // When
+        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(year, month);
+
+        // Then
+        assertEquals(hasData, result.isPresent());
+        if (hasData) {
+            assertEquals(1, result.get().size());
+        }
+        verify(moneyRepository).findByYearAndMonthAndAccountType(year, month, AccountType.CREDIT);
     }
 
-    @Test
-    void getMoneyByYear() {
-        MoneyDTO moneyDTO1 = new MoneyDTO(BigDecimal.valueOf(3000), "credit", "07");
-        MoneyDTO moneyDTO2 = new MoneyDTO(BigDecimal.valueOf(4000), "credit", "08");
-        moneyService.depositMoney(moneyDTO1);
-        moneyService.depositMoney(moneyDTO2);
+    @ParameterizedTest(name = "getMoneyByYear - year={0}, hasData={1}")
+    @CsvSource({
+            "2024, true",
+            "2023, false"
+    })
+    void getMoneyByYear(String year, boolean hasData) {
+        // Given
+        Optional<List<Money>> mockResult = hasData ?
+                Optional.of(List.of(
+                        createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, "07"),
+                        createMockMoney(BigDecimal.valueOf(2000), AccountType.CREDIT, "08")
+                )) :
+                Optional.empty();
 
-        Optional<List<Money>> result = moneyService.getMoneyByYear(String.valueOf(LocalDate.now().getYear()));
+        when(moneyRepository.findByYearAndAccountType(year, AccountType.CREDIT)).thenReturn(mockResult);
 
-        assertTrue(result.isPresent());
-        assertEquals(2, result.get().size());
+        // When
+        Optional<List<Money>> result = moneyService.getMoneyByYear(year);
+
+        // Then
+        assertEquals(hasData, result.isPresent());
+        if (hasData) {
+            assertEquals(2, result.get().size());
+        }
+        verify(moneyRepository).findByYearAndAccountType(year, AccountType.CREDIT);
+    }
+
+    private Money createMockMoney(BigDecimal amount, AccountType accountType, String month) {
+        return Money.builder()
+                .cash(amount)
+                .accountType(accountType)
+                .month(month)
+                .year(String.valueOf(LocalDate.now().getYear()))
+                .addedAt(LocalDateTime.now())
+                .transactionType(TransactionType.DEPOSIT)
+                .build();
     }
 }
