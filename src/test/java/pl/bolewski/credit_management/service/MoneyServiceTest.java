@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 import pl.bolewski.credit_management.dto.MoneyDTO;
 import pl.bolewski.credit_management.model.AccountType;
 import pl.bolewski.credit_management.model.Money;
