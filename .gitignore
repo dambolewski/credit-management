@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 compose.yaml
+backups/
+*.sql
+*.dump
