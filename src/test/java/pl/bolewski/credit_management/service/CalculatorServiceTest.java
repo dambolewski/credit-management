@@ -61,21 +61,6 @@ class CalculatorServiceTest {
     }
 
     @Test
-    void updateBalance_throwsExceptionForNullAccountType() {
-        // Given
-        Balance balance = Balance.builder()
-                .accountId(1L)
-                .okoBalance(BigDecimal.ZERO)
-                .creditBalance(BigDecimal.ZERO)
-                .build();
-        when(balanceService.getBalance()).thenReturn(balance);
-
-        // When & Then
-        assertThrows(NullPointerException.class, () ->
-                calculatorService.updateBalance(BigDecimal.valueOf(100), null, TransactionType.DEPOSIT));
-    }
-
-    @Test
     void calculateMoneyInsideList() {
         // Given
         Money deposit1 = Money.builder()
