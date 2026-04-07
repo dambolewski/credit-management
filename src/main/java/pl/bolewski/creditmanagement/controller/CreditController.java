@@ -12,7 +12,7 @@ import pl.bolewski.creditmanagement.service.CreditService;
 @RequiredArgsConstructor
 public class CreditController {
 
-    public final CreditService creditService;
+    private final CreditService creditService;
 
     @GetMapping("/api/credit/checkMonthly/{year}/{month}")
     public MonthVerifierDTO getMonthlyStatus(@PathVariable String year, @PathVariable String month){

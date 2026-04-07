@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -40,7 +39,7 @@ class TreasuryBondServiceTest {
                 createMockMoney(BigDecimal.valueOf(1500), "03", "2024")
         );
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.of(mockMoneyList));
+                .thenReturn(mockMoneyList);
 
         // When
         List<TreasuryBondDTO> result = treasuryBondService.getTreasuryBondList();
@@ -66,7 +65,7 @@ class TreasuryBondServiceTest {
     void getTreasuryBondList_returnsEmptyListWhenNoData() {
         // Given
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.empty());
+                .thenReturn(List.of());
 
         // When
         List<TreasuryBondDTO> result = treasuryBondService.getTreasuryBondList();
@@ -86,7 +85,7 @@ class TreasuryBondServiceTest {
         // Given
         List<Money> mockMoneyList = createMockMoneyList(itemCount);
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.of(mockMoneyList));
+                .thenReturn(mockMoneyList);
 
         // When
         BigDecimal result = treasuryBondService.calculateDepositedTreasuryBond();
@@ -100,7 +99,7 @@ class TreasuryBondServiceTest {
     void calculateDepositedTreasuryBond_returnsZeroWhenNoData() {
         // Given
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.empty());
+                .thenReturn(List.of());
 
         // When
         BigDecimal result = treasuryBondService.calculateDepositedTreasuryBond();
@@ -119,7 +118,7 @@ class TreasuryBondServiceTest {
                 createMockMoney(BigDecimal.valueOf(250.75), "03", "2024")
         );
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.of(mockMoneyList));
+                .thenReturn(mockMoneyList);
 
         // When
         BigDecimal result = treasuryBondService.calculateDepositedTreasuryBond();
@@ -135,7 +134,7 @@ class TreasuryBondServiceTest {
                 createMockMoney(BigDecimal.valueOf(5000), "12", "2023")
         );
         when(moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND))
-                .thenReturn(Optional.of(mockMoneyList));
+                .thenReturn(mockMoneyList);
 
         // When
         List<TreasuryBondDTO> result = treasuryBondService.getTreasuryBondList();

@@ -17,7 +17,6 @@ public class TreasuryBondService {
 
     public BigDecimal calculateDepositedTreasuryBond() {
         return moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND)
-                .orElse(List.of())
                 .stream()
                 .map(Money::getCash)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -25,7 +24,6 @@ public class TreasuryBondService {
 
     public List<TreasuryBondDTO> getTreasuryBondList() {
         return moneyService.getMoneyByAccountType(AccountType.TREASURY_BOND)
-                .orElse(List.of())
                 .stream()
                 .map(this::mapToTreasuryBondDTO)
                 .toList();

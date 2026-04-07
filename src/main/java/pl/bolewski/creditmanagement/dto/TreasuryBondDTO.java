@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TreasuryBondDTO {
-    String month;
-    String year;
-    BigDecimal treasuryBond;
+    private String month;
+    private String year;
+    private BigDecimal treasuryBond;
 }

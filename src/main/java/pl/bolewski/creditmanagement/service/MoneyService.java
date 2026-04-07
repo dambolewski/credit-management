@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,17 +51,17 @@ public class MoneyService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Money>> getMoneyByYearAndMonth(String year, String month, AccountType accountType) {
+    public List<Money> getMoneyByYearAndMonth(String year, String month, AccountType accountType) {
         return moneyRepository.findByYearAndMonthAndAccountType(year, month, accountType);
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Money>> getMoneyByYear(String year, AccountType accountType) {
+    public List<Money> getMoneyByYear(String year, AccountType accountType) {
         return moneyRepository.findByYearAndAccountType(year, accountType);
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Money>> getMoneyByAccountType(AccountType accountType) {
+    public List<Money> getMoneyByAccountType(AccountType accountType) {
         return moneyRepository.findByAccountType(accountType);
     }
 

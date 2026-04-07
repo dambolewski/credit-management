@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TreasuryBondController {
 
-    public final TreasuryBondService treasuryBondService;
+    private final TreasuryBondService treasuryBondService;
 
     @GetMapping("/api/treasuryBond/checkDepositedAmount")
     public BigDecimal checkDepositedAmount(){

@@ -10,7 +10,6 @@ import pl.bolewski.creditmanagement.model.Money;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +24,13 @@ public class CreditService {
 
     @Transactional(readOnly = true)
     public MonthVerifierDTO checkMonthlyPayouts(String year, String month) {
-        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
-        List<Money> moneyList = moneyListOptional.orElse(List.of());
+        List<Money> moneyList = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
         return createMonthVerifierDTO(month, moneyList);
     }
 
     @Transactional(readOnly = true)
     public YearlyVerifierDTO checkYearlyPayouts(String year) {
-        Optional<List<Money>> moneyListOptional = moneyService.getMoneyByYear(year, AccountType.CREDIT);
-        List<Money> moneyList = moneyListOptional.orElse(List.of());
+        List<Money> moneyList = moneyService.getMoneyByYear(year, AccountType.CREDIT);
         return createYearlyVerifierDTO(year, moneyList);
     }
 

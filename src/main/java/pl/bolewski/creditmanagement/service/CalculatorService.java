@@ -1,6 +1,6 @@
 package pl.bolewski.creditmanagement.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.bolewski.creditmanagement.model.AccountType;

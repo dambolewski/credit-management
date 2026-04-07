@@ -15,7 +15,6 @@ import pl.bolewski.creditmanagement.model.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -46,11 +45,7 @@ class CreditServiceTest {
                 List.of() :
                 List.of(createTestMoney(collected.intValue(), AccountType.CREDIT, month, "2024", TransactionType.DEPOSIT));
 
-        Optional<List<Money>> moneyListOptional = collected.equals(BigDecimal.ZERO) ?
-                Optional.empty() :
-                Optional.of(moneyList);
-
-        when(moneyService.getMoneyByYearAndMonth("2024", month, AccountType.CREDIT)).thenReturn(moneyListOptional);
+        when(moneyService.getMoneyByYearAndMonth("2024", month, AccountType.CREDIT)).thenReturn(moneyList);
         when(calculatorService.calculateMoneyInsideList(anyList())).thenReturn(collected);
 
         // When
@@ -76,7 +71,7 @@ class CreditServiceTest {
         // Given
         List<Money> moneyList = List.of(createTestMoney(collected.intValue(), AccountType.CREDIT, "01", year, TransactionType.DEPOSIT));
 
-        when(moneyService.getMoneyByYear(year, AccountType.CREDIT)).thenReturn(Optional.of(moneyList));
+        when(moneyService.getMoneyByYear(year, AccountType.CREDIT)).thenReturn(moneyList);
         when(calculatorService.calculateMoneyInsideList(moneyList)).thenReturn(collected);
 
         // When

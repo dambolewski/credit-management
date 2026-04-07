@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 @Getter
-    public class Money {
+public class Money {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;

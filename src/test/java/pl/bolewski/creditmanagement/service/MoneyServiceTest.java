@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -123,21 +122,18 @@ class MoneyServiceTest extends TestcontainersSetup {
     })
     void getMoneyByYearAndMonth(String year, String month, boolean hasData) {
         // Given
-        Optional<List<Money>> mockResult = hasData ?
-                Optional.of(List.of(createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, month))) :
-                Optional.empty();
+        List<Money> mockResult = hasData ?
+                List.of(createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, month)) :
+                List.of();
 
         when(moneyRepository.findByYearAndMonthAndAccountType(year, month, AccountType.CREDIT))
                 .thenReturn(mockResult);
 
         // When
-        Optional<List<Money>> result = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
+        List<Money> result = moneyService.getMoneyByYearAndMonth(year, month, AccountType.CREDIT);
 
         // Then
-        assertEquals(hasData, result.isPresent());
-        if (hasData) {
-            assertEquals(1, result.get().size());
-        }
+        assertEquals(hasData ? 1 : 0, result.size());
         verify(moneyRepository).findByYearAndMonthAndAccountType(year, month, AccountType.CREDIT);
     }
 
@@ -148,23 +144,20 @@ class MoneyServiceTest extends TestcontainersSetup {
     })
     void getMoneyByYear(String year, boolean hasData) {
         // Given
-        Optional<List<Money>> mockResult = hasData ?
-                Optional.of(List.of(
+        List<Money> mockResult = hasData ?
+                List.of(
                         createMockMoney(BigDecimal.valueOf(1000), AccountType.CREDIT, "07"),
                         createMockMoney(BigDecimal.valueOf(2000), AccountType.CREDIT, "08")
-                )) :
-                Optional.empty();
+                ) :
+                List.of();
 
         when(moneyRepository.findByYearAndAccountType(year, AccountType.CREDIT)).thenReturn(mockResult);
 
         // When
-        Optional<List<Money>> result = moneyService.getMoneyByYear(year, AccountType.CREDIT);
+        List<Money> result = moneyService.getMoneyByYear(year, AccountType.CREDIT);
 
         // Then
-        assertEquals(hasData, result.isPresent());
-        if (hasData) {
-            assertEquals(2, result.get().size());
-        }
+        assertEquals(hasData ? 2 : 0, result.size());
         verify(moneyRepository).findByYearAndAccountType(year, AccountType.CREDIT);
     }
 

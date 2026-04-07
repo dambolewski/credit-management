@@ -43,10 +43,10 @@ public class BalanceService {
         return balanceDto.getCreditBalance().add(balanceDto.getOkoBalance());
     }
 
-    private Balance updateExistingBalance(Balance exisitingBalance, Balance balance) {
-        exisitingBalance.setOkoBalance(balance.getOkoBalance());
-        exisitingBalance.setCreditBalance(balance.getCreditBalance());
-        return balanceRepository.save(exisitingBalance);
+    private Balance updateExistingBalance(Balance existingBalance, Balance balance) {
+        existingBalance.setOkoBalance(balance.getOkoBalance());
+        existingBalance.setCreditBalance(balance.getCreditBalance());
+        return balanceRepository.save(existingBalance);
     }
 
     private BalanceDTO toBalanceDTO(Balance balance) {
