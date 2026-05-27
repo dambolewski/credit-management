@@ -1,5 +1,6 @@
 package pl.bolewski.creditmanagement.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,44 +22,44 @@ public class MoneyController {
     private final MoneyService moneyService;
 
     @PostMapping("/api/money/deposit")
-    public ResponseEntity<ApiResponse> depositMoney(@RequestBody MoneyDTO moneyDTO) {
+    public ResponseEntity<ApiResponse> depositMoney(@Valid @RequestBody MoneyDTO moneyDTO) {
         moneyService.depositMoney(moneyDTO);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("DEPOSIT - Money processed successfully")
-                .status(200)
+                .status(201)
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
 
     @PostMapping("/api/money/deposit-list")
-    public ResponseEntity<ApiResponse> depositMoneyList(@RequestBody List<MoneyDTO> moneyDTOList) {
+    public ResponseEntity<ApiResponse> depositMoneyList(@Valid @RequestBody List<MoneyDTO> moneyDTOList) {
         moneyService.depositMoneyList(moneyDTOList);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("DEPOSIT - Money list processed successfully")
-                .status(200)
+                .status(201)
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/money/withdraw")
-    public ResponseEntity<ApiResponse> withdrawMoney(@RequestBody MoneyDTO moneyDTO) {
+    public ResponseEntity<ApiResponse> withdrawMoney(@Valid @RequestBody MoneyDTO moneyDTO) {
         moneyService.withdrawMoney(moneyDTO);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("WITHDRAW - Money processed successfully")
-                .status(200)
+                .status(201)
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/money/withdraw-list")
-    public ResponseEntity<ApiResponse> withdrawMoneyList(@RequestBody List<MoneyDTO> moneyDTOList) {
+    public ResponseEntity<ApiResponse> withdrawMoneyList(@Valid @RequestBody List<MoneyDTO> moneyDTOList) {
         moneyService.withdrawMoneyList(moneyDTOList);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("WITHDRAW - Money list processed successfully")
-                .status(200)
+                .status(201)
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/api/money/getHistory")

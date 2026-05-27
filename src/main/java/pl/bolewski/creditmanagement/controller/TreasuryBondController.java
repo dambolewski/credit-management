@@ -15,8 +15,8 @@ public class TreasuryBondController {
 
     private final TreasuryBondService treasuryBondService;
 
-    @GetMapping("/api/treasuryBond/checkDepositedAmount")
-    public BigDecimal checkDepositedAmount(){
+    @GetMapping("/api/treasuryBond/getDepositedAmount")
+    public BigDecimal getDepositedAmount(){
         return treasuryBondService.calculateDepositedTreasuryBond();
     }
 

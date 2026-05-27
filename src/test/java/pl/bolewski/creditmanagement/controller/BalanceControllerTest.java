@@ -42,9 +42,9 @@ class BalanceControllerTest {
         mockMvc.perform(post("/api/balance/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(balance)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("Balance added"))
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.status").value(201));
     }
 
     @Test

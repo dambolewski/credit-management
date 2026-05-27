@@ -13,7 +13,6 @@ import pl.bolewski.creditmanagement.model.AccountType;
 import pl.bolewski.creditmanagement.model.Money;
 import pl.bolewski.creditmanagement.model.TransactionType;
 import pl.bolewski.creditmanagement.repository.MoneyRepository;
-import pl.bolewski.creditmanagement.testcontainers.TestcontainersSetup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MoneyServiceTest extends TestcontainersSetup {
+class MoneyServiceTest {
 
     @InjectMocks
     MoneyService moneyService;

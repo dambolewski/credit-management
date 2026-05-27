@@ -25,10 +25,10 @@ class TreasuryBondControllerTest {
     private TreasuryBondService treasuryBondService;
 
     @Test
-    void checkDepositedAmount() throws Exception {
+    void getDepositedAmount() throws Exception {
         Mockito.when(treasuryBondService.calculateDepositedTreasuryBond()).thenReturn(BigDecimal.valueOf(10000));
 
-        mockMvc.perform(get("/api/treasuryBond/checkDepositedAmount"))
+        mockMvc.perform(get("/api/treasuryBond/getDepositedAmount"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("10000"));
     }

@@ -31,10 +31,10 @@ class MoneyControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }"))
-                .andExpect(status().isOk())
+                        .content("{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" }"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("DEPOSIT - Money processed successfully"))
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.status").value(201));
     }
 
     @Test
@@ -43,10 +43,10 @@ class MoneyControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/deposit-list")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("[{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" },{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }]"))
-                .andExpect(status().isOk())
+                        .content("[{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" },{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" }]"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("DEPOSIT - Money list processed successfully"))
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.status").value(201));
     }
 
     @Test
@@ -55,10 +55,10 @@ class MoneyControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }"))
-                .andExpect(status().isOk())
+                        .content("{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" }"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("WITHDRAW - Money processed successfully"))
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.status").value(201));
     }
 
     @Test
@@ -67,10 +67,10 @@ class MoneyControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/money/withdraw-list")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("[{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" },{ \"cash\": 100, \"account\": \"account1\", \"month\": \"January\" }]"))
-                .andExpect(status().isOk())
+                        .content("[{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" },{ \"cash\": 100, \"accountType\": \"OKO\", \"month\": \"January\" }]"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("WITHDRAW - Money list processed successfully"))
-                .andExpect(jsonPath("$.status").value(200));
+                .andExpect(jsonPath("$.status").value(201));
     }
 
     @Test

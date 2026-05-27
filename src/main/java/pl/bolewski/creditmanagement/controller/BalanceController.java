@@ -1,5 +1,6 @@
 package pl.bolewski.creditmanagement.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,13 @@ public class BalanceController {
     private final BalanceService balanceService;
 
     @PostMapping("/api/balance/add")
-    public ResponseEntity<ApiResponse> addBalance(@RequestBody Balance balance) {
+    public ResponseEntity<ApiResponse> addBalance(@Valid @RequestBody Balance balance) {
         balanceService.addBalance(balance);
         ApiResponse apiResponse = ApiResponse.builder()
                 .message("Balance added")
-                .status(200)
+                .status(201)
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/api/balance/getBalance")
